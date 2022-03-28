@@ -1,7 +1,9 @@
+# Task 3) Analyzing a movie dataset
+
 import pandas as pd
 import numpy as np
 
-
+# function to convert to float
 def to_float(x):
     try:
         x = float(x)
@@ -18,7 +20,7 @@ print(type(df))
 print('\nfirst movie:\n' + df.head(1).to_string())
 print('\nlast movie:\n' + df.tail(1).to_string())
 
-print('\n\nJumanji:\n', df.loc[df['original_title'] == 'Jumanji'])
+print('\nJumanji:\n', df.loc[df['original_title'] == 'Jumanji'])
 
 
 # create sub-df for specified columns (as a copy)

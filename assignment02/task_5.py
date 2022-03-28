@@ -1,3 +1,5 @@
+# Task 5) Finding similar users
+
 import pandas as pd
 
 COMMON_MOVIES_THRESHOLD = 3
