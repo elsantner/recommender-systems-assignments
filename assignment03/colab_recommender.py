@@ -8,6 +8,7 @@ class ColabRecommender:
     def __init__(self, data=movie_data.MovieData(), sample_size=-1):
         self.data = data
         self.sample_size = sample_size
+        # create pivot table for fast rating lookup
         self.table = self.create_pivot_table()
 
         # sample random user and movie IDs to reduce computation time
@@ -20,14 +21,17 @@ class ColabRecommender:
             self.other_user_ids = sample.columns
             self.movie_ids = sample.sample(sample_size, axis='rows').index
 
+    # create a pivot table (cols: user, rows: movie, cells: rating)
     def create_pivot_table(self):
-        # filter df by userID
         return pd.pivot_table(self.data.ratings_df, values='Rating', columns=[self.data.ratings_df['UserID']],
                               index=[self.data.ratings_df['MovieID']])
 
+    # get the mean rating of user_id
     def __get_avg_rating_of_user(self, user_id):
         return self.data.ratings_df.loc[self.data.ratings_df['UserID'] == user_id]['Rating'].mean()
 
+    # get the rating of user_id for movie_id
+    # returns NaN if no rating exists
     def __get_rating(self, user_id, movie_id):
         return self.table[user_id][movie_id]
 
@@ -41,10 +45,11 @@ class ColabRecommender:
                 common_movies.append(element)
         return common_movies
 
-    # returns ((rating for this movie) - (avg rating))
+    # returns ((rating for this movie) - (avg rating of user_id))
     def __get_corrected_rating(self, user_id, movie_id):
         return self.__get_rating(user_id, movie_id) - self.__get_avg_rating_of_user(user_id)
 
+    # calculate the pearson correlation between the ratings of user_id1 and user_id2 on commonly rated movies
     def pearson_correlation(self, user_id1, user_id2):
         common_movies = self.__get_common_rated_movies(user_id1, user_id2)
 
@@ -70,9 +75,11 @@ class ColabRecommender:
 
         return numerator / denominator
 
+    # get the k most similar ("nearest") users to user_id in regard to ratings
     def get_k_nearest_neighbours(self, user_id, k):
         sim_scores = []
         for other_user_id in self.other_user_ids:
+            # omit same user
             if other_user_id != user_id:
                 sim_scores.append([other_user_id, self.pearson_correlation(user_id, other_user_id)])
 
@@ -80,10 +87,12 @@ class ColabRecommender:
             .sort_values(by='sim', ascending=False) \
             .head(k)
 
+    # predict the relevance of movie_id considering the ratings of the k nearest neighbours (knn)
     # k ... number of nearest neighbours considered
     # see 'Lecture Slides Part 1', slide 30 for calculation details
     def predict_relevance(self, movie_id, knn, avg_rating_user):
         # calculate predictions for users who rated this movie
+        # if user did not rate movie then add 0 to sum (effectively omitting user from calculation)
         numerator = sum(
             [other_user['sim'] * self.__get_corrected_rating(other_user['userId'], movie_id)
              if not math.isnan(self.__get_rating(other_user['userId'], movie_id)) else 0
