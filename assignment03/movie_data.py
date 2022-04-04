@@ -40,6 +40,9 @@ class MovieData:
     def get_movie_details(self, movie_ids_df):
         return pd.merge(movie_ids_df, self.movies_df, on='MovieID', how='inner')
 
+    def check_user_exists(self, user_id):
+        return user_id in self.user_df['UserID']
+
     def get_movie_count(self):
         return self.movies_df.size
 
