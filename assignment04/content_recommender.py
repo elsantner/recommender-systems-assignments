@@ -1,8 +1,7 @@
 # Collaborative recommender implementation
-import math
 import pandas as pd
+
 import movie_data
-from random import sample
 
 
 class ContentBasedRecommender:

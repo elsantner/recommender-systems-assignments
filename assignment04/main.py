@@ -22,6 +22,7 @@ if __name__ == "__main__":
     try:
         # Command line arguments
         # --user        set the user_id for which to generate recommendations
+        # --strategy    strategy to be used in recommendation process
         # --sample      set the number of randomly sampled movies used in recommendation process
         #               (does not influence user profile creation)
         parser = argparse.ArgumentParser()
@@ -47,6 +48,9 @@ if __name__ == "__main__":
         if md.get_movie_count() < args.sample_size:
             raise ValueError('Sample size must be smaller than user and movie count ({0})'
                              .format(md.get_movie_count()))
+
+        print('\nUser has previously rated:')
+        print(md.get_rated_movies_df(args.user_id)[['Title', 'Genres']])
 
         # create user profile and print
         recommender = content_recommender.ContentBasedRecommender(data=md, sample_size=args.sample_size)
