@@ -105,7 +105,9 @@ class ColabRecommender:
              if not math.isnan(self.__get_rating(other_user['userId'], movie_id)) else 0
              for _, other_user in knn.iterrows()])
 
-        return avg_rating_user + ((numerator / denominator) if denominator != 0 else 0)
+        relevance_prediction = avg_rating_user + ((numerator / denominator) if denominator != 0 else 0)
+        # clamp relevance score to (1,5)
+        return max(min(relevance_prediction, 5), 1)
 
     # generate recommendations
     # see 'Lecture Slides Part 1', slide 33 for details
