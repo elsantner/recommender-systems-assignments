@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Recommendations</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}" type="text/css">
+    </head>
+    <body>
+        <div class="container" style="margin-bottom: 10%; margin-top: 5%">
+            {% if not metadata.empty %}
+                <h1>Recommendations for user {{ userId }}</h1>
+                <table class="dataframe table table-striped">
+                  <tr>
+                    <th>Prediction</th><th>Poster</th><th>Title</th><th>Genres</th><th>Description</th><th>Cast</th>
+                  </tr>
+                    {% for index, row in metadata.iterrows %}
+                        <tr>
+                            <td>{{ row.mean_rating }}</td>
+                            <td><img src="{{ row.poster_path }}" width="75%" alt="{{ row.title }}"></td>
+                            <td>{{ row.title }}</td>
+                            <td>{{ row.genres }}</td>
+                            <td>{{ row.overview }}</td>
+                            <td>{{ row.cast }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <h1>No recommendations for user {{ userId }} found</h1>
+            {% endif %}
+            <br>
+            <a href="{% url 'task2:index' %}" class="btn btn-lg btn-primary" style="position: absolute; left: 45%">Back</a>
+        </div>
+    </body>
+</html>

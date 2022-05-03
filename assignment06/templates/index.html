@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Django Recommender Demo</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}" type="text/css">
+    </head>
+    <body>
+        <div class="container" style="margin-bottom: 10%; margin-top: 5%">
+            <h1>Django Recommender Demo</h1>
+            <p>Enter User ID:</p>
+            <form action="{% url 'task2:recommendation' %}" method="POST">
+                {% csrf_token %}
+                <input type="number" id="userId" name="userId" min="1" max="671" required>
+                <br><br>
+                <button type="submit" class="btn btn-lg btn-outline-primary">Show Recommendations</button>
+            </form>
+        </div>
+    </body>
+</html>
