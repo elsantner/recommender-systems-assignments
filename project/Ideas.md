@@ -1,0 +1,36 @@
+# Recommender Systems project ideas
+*Elias Santner & Jana Siebert*
+## (Potentially) relevant information in movies_tmdbMeta
+- title
+- overview (i.e. plot description)
+- director
+- cast
+- budget
+- popularity
+- release date
+- runtime
+- original language
+- spoken languages
+- production countries
+
+## Strategy ideas
+**Task:** Develop a number of (at least 5) functions in Python that, given a _reference_ _movie_ _ID_ (_mref_), return a ranked list of the top-5 most similar items. Each function has to implement a different strategy.
+
+### 1. Genre overlap & movie popularity
+Rank by simple genre overlap with _mref_ and movie popularity.
+
+### 2. Title & Overview TF-IDF
+Rank movies by the similarity of _title_ and _overview_ with _mref_.
+Use Longest Common Subsentence (LCS) for _title_ and TF-IDF for _overview_.
+
+### 3. Directors, actors & popularity
+Select movies which have a "significant" director and actor overlap with _mref_.
+Sort these movies by popularity.
+
+### 4. Runtime, original language and production countries
+Select movies which have a "similar" runtime (+/- _n_ minutes), the same original language and production countries.
+Rank by **?**.
+
+### 5. Actors, genres and release year
+Select movies within a similar release time frame to _mref_, e.g. +/- 2 years.
+Sort these movies by actor and genre similarity (using Cosine or Jaccard-based similarity measures).
