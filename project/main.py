@@ -1,0 +1,87 @@
+import argparse
+
+import pandas as pd
+
+import movie_data
+
+
+def show_movie_id_prompt():
+    while True:
+        try:
+            movie_id = int(input("Enter the movie ID: "))
+            return movie_id
+        except ValueError:
+            print("Please input integer only...")
+
+
+def validate_args(m_data, arguments):
+    if args.strategy not in ('all', '1', '2', '3', '4', '5'):
+        raise ValueError('Strategy must be in (all, 1-5)')
+
+    # if sample size > actual movie count
+    if m_data.get_movie_count() < arguments.sample_size:
+        raise ValueError('Sample size must be smaller than user and movie count ({0})'
+                         .format(m_data.get_movie_count()))
+    if not m_data.movie_exists(arguments.movie_id):
+        raise ValueError('Movie {0} does not exist'.format(arguments.movie_id))
+
+
+if __name__ == "__main__":
+    # try:
+
+    # Command line arguments
+    # --user        set the user_id for which to generate recommendations
+    # --strategy    strategy to be used in recommendation process
+    # --sample      set the number of randomly sampled movies used in recommendation process
+    #               (does not influence user profile creation)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--movie', dest='movie_id', type=int, default=-1,
+                        help='id of the reference movie')
+    parser.add_argument('--strategy', dest='strategy', type=str, default='all',
+                        help='strategy to use for recommendations (1-5)')
+    parser.add_argument('--sample', dest='sample_size', type=int, default=-1,
+                        help='set the number of randomly sampled movies used in recommendation process')
+
+    args = parser.parse_args()
+    # if movie_id was not set via cl arguments then prompt user for input
+    if args.movie_id == -1:
+        args.movie_id = show_movie_id_prompt()
+
+    print('Loading data...')
+    md = movie_data.MovieData()
+
+    validate_args(md, args)
+
+    print('\nReference movie:')
+    print(md.get_movie_metadata(pd.DataFrame([args.movie_id], columns=['id']))[['id', 'title']])
+
+    print('\nGenerating recommendations...')
+
+    # Please Note: How to access list in dataframe cells
+    # print(row['cast'][0][i])   ...  where 'cast' is the column name and 'i' is the index within the embedded list
+
+    # Use 'args.movie_id' and 'md' to generate recommendations
+    # recommendation strategy 1
+    if args.strategy in ('1', 'all'):
+        print('\nRECOMMENDATIONS (1):')
+        # TODO: implement recommendation strategy 1
+    # recommendation strategy 2
+    if args.strategy in ('2', 'all'):
+        print('\nRECOMMENDATIONS (2):')
+        # TODO: implement recommendation strategy 2
+    # recommendation strategy 3
+    if args.strategy in ('3', 'all'):
+        print('\nRECOMMENDATIONS (3):')
+        # TODO: implement recommendation strategy 3
+    # recommendation strategy 4
+    if args.strategy in ('4', 'all'):
+        print('\nRECOMMENDATIONS (4):')
+        # TODO: implement recommendation strategy 4
+    # recommendation strategy 5
+    if args.strategy in ('5', 'all'):
+        print('\nRECOMMENDATIONS (5):')
+        # TODO: implement recommendation strategy 5
+
+    # TODO: reactive error handling once development/debugging is finished
+    # except (ValueError, KeyError) as e:
+    #    print('Error: ' + str(e))
