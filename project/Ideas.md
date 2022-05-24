@@ -1,5 +1,5 @@
 # Recommender Systems project ideas
-*Elias Santner & Jana Siebert*
+*Antonios Marinidis, Elias Santner & Jana Siebert*
 ## (Potentially) relevant information in movies_tmdbMeta
 - title
 - overview (i.e. plot description)
@@ -23,14 +23,24 @@ Rank by simple genre overlap with _mref_ and movie popularity.
 Rank movies by the similarity of _title_ and _overview_ with _mref_.
 Use Longest Common Subsentence (LCS) for _title_ and TF-IDF for _overview_.
 
+*Note: Might not be good in practice, but aims at recommending **similar** items.*
+
 ### 3. Directors, actors & popularity
 Select movies which have a "significant" director and actor overlap with _mref_.
 Sort these movies by popularity.
+If not enough director overlap exists, use just actor overlap.
+*Maybe include genre overlap as well!*
 
 ### 4. Runtime, original language and production countries
 Select movies which have a "similar" runtime (+/- _n_ minutes), the same original language and production countries.
-Rank by **?**.
+Rank by popularity.
 
 ### 5. Actors, genres and release year
 Select movies within a similar release time frame to _mref_, e.g. +/- 2 years.
 Sort these movies by actor and genre similarity (using Cosine or Jaccard-based similarity measures).
+
+*Apply step-by-step: release year, genre sim and rank by actor sim.*
+
+## Questions
+- Are these ideas different strategies?
+- Do we always have to recommend *exactly 5* items? - **10 items!**
