@@ -29,6 +29,7 @@ Use Longest Common Subsentence (LCS) for _title_ and TF-IDF for _overview_.
 Select movies which have a "significant" director and actor overlap with _mref_.
 Sort these movies by popularity.
 If not enough director overlap exists, use just actor overlap.
+*Maybe include genre overlap as well!*
 
 ### 4. Runtime, original language and production countries
 Select movies which have a "similar" runtime (+/- _n_ minutes), the same original language and production countries.
@@ -42,4 +43,4 @@ Sort these movies by actor and genre similarity (using Cosine or Jaccard-based s
 
 ## Questions
 - Are these ideas different strategies?
-- Do we always have to recommend *exactly 5* items?
+- Do we always have to recommend *exactly 5* items? - **10 items!**
