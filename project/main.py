@@ -3,7 +3,10 @@ import argparse
 import pandas as pd
 
 import movie_data
+from recommender.strategy_5 import RecommenderStrategy5
 
+
+RECOMMENDATION_COUNT = 10
 
 def show_movie_id_prompt():
     while True:
@@ -52,13 +55,13 @@ if __name__ == "__main__":
 
     validate_args(md, args)
 
-    print('\nReference movie:')
-    print(md.get_movie_metadata(pd.DataFrame([args.movie_id], columns=['id']))[['id', 'title']])
-
     print('\nGenerating recommendations...')
 
     # Please Note: How to access list in dataframe cells
     # print(row['cast'][0][i])   ...  where 'cast' is the column name and 'i' is the index within the embedded list
+
+    # auto-adapt df table size to console window
+    pd.options.display.width = 0
 
     # Use 'args.movie_id' and 'md' to generate recommendations
     # recommendation strategy 1
@@ -79,8 +82,13 @@ if __name__ == "__main__":
         # TODO: implement recommendation strategy 4
     # recommendation strategy 5
     if args.strategy in ('5', 'all'):
+        print('\nReference movie:')
+        print(md.get_movie_metadata_single(args.movie_id)[['id', 'title', 'release_year', 'genres', 'cast']])
+
         print('\nRECOMMENDATIONS (5):')
-        # TODO: implement recommendation strategy 5
+        rec = RecommenderStrategy5(data=md, sample_size=args.sample_size, rec_count=RECOMMENDATION_COUNT)
+        recommendations = rec.get_recommendations(args.movie_id)
+        print(recommendations[['id', 'title', 'release_year', 'genres', 'cast', 'sim']])
 
     # TODO: reactive error handling once development/debugging is finished
     # except (ValueError, KeyError) as e:
