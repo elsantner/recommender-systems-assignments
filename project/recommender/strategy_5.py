@@ -27,8 +27,6 @@ class RecommenderStrategy5:
         self.rec_count = rec_count
 
         # sample random user and movie IDs to reduce computation time
-        # the pivot table still contains all data entries, just the ids used in the recommendation process are sampled
-
         if self.sample_size == -1:
             # no sampling required
             self.__sample_movie_df = self.data.movies_df
@@ -42,11 +40,13 @@ class RecommenderStrategy5:
         df = self.__sample_movie_df.copy()
         # remove mref from movie recommendations
         df = df.drop(df[df['id'] == mref_id].index)
-        mref_release_year = mref['release_year']
 
+        mref_release_year = mref['release_year']
         release_filtered_df = df.loc[(df['release_year'] >= mref_release_year - RELEASE_YEAR_DIFF) &
                                      (df['release_year'] <= mref_release_year + RELEASE_YEAR_DIFF)].copy()
 
+        # calculate genre similarity between mref and each movie
+        # if a movie has no genres set (if NaN), then set to 0
         release_filtered_df['genre_sim'] = release_filtered_df['genres'] \
             .apply(lambda g: helper.jaccard_similarity(g, mref['genres']) if g == g else 0)
 

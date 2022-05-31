@@ -46,8 +46,6 @@ class MovieData:
     def __read_ratings_df(self):
         return read_dat_file(self.path + "/ratings_small.csv")
 
-    # parse CSV file
-
     # get movie metadata
     def get_movie_metadata(self, movie_ids_df):
         return pd.merge(movie_ids_df, self.movies_df, on='id', how='inner')
