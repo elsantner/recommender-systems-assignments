@@ -35,6 +35,11 @@ class MovieData:
         df['genres'] = df['genres'].apply(parse_list)
         df['cast'] = df['cast'].apply(parse_list)
         df['production_countries'] = df['production_countries'].apply(parse_list)
+        df.loc['release_date'] = pd.to_datetime(df['release_date'], errors='coerce')
+        # x == x ... NaN check
+        df['release_year'] = df['release_date'].apply(
+            lambda x: int(str(x).split('-')[0]) if x == x else 0)
+        df['release_year'] = df['release_year'].astype('int')
 
         return df
 
@@ -46,6 +51,9 @@ class MovieData:
     # get movie metadata
     def get_movie_metadata(self, movie_ids_df):
         return pd.merge(movie_ids_df, self.movies_df, on='id', how='inner')
+
+    def get_movie_metadata_single(self, movie_id):
+        return self.movies_df.loc[self.movies_df['id'] == movie_id]
 
     def get_movie_count(self):
         return self.movies_df.size
