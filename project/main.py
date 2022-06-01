@@ -73,6 +73,8 @@ if __name__ == "__main__":
         print('\nRECOMMENDATIONS (1):')
         rec = RecommenderStrategy1(data=md, sample_size=args.sample_size, rec_count=RECOMMENDATION_COUNT)
         recommendations1 = rec.get_recommendations(args.movie_id)
+        # sort the top 10 recommendations of genre by their popularity
+        recommendations1 = recommendations1.sort_values(by='popularity', ascending=False)
         print(recommendations1[['id', 'title', 'popularity', 'genres', 'cast', 'sim']])
     if args.strategy in ('2', 'all'):
         print('\nRECOMMENDATIONS (2):')

@@ -2,27 +2,16 @@ from . import helper
 
 RECOMMENDATION_COUNT = 10
 
-
-# if previous similarity
 def calc_sim(row):
-    sim = row['genre_sim'] * row['popularity']
-    if sim == 0:
-        # replace 0 values by adding up remaining similarities
-        return row['genre_sim'] + row['popularity']
-    else:
-        # add 10 to keep them at the top of the sorted list
-        return sim + 10
-
+    sim = row['genre_sim']
+    return sim
 
 # Genres and Popularity
-
 class RecommenderStrategy1:
     def __init__(self, data, sample_size=-1, rec_count=10):
         self.data = data
         self.sample_size = sample_size
         self.rec_count = rec_count
-
-        # self.__sample_movie_df = self.data.movies_df
 
     # recommendations based on genre and popularity
     def get_recommendations(self, mref_id):
@@ -31,7 +20,6 @@ class RecommenderStrategy1:
         df = self.data.movies_df.copy()
         # remove mref from movie recommendations
         df = df.drop(df[df['id'] == mref_id].index)
-
 
         # calculate genre similarity between mref and each movie
         # if a movie has no genres set (if NaN), then set to 0

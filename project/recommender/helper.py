@@ -7,15 +7,6 @@ def jaccard_similarity(x, y):
     # jaccard = intersection / union
     return float(len(a.intersection(b))) / len(a.union(b))
 
-def compute_overlap(x, y):
-    a = set(x)
-    b = set(y)
-    shape1 = a.shape
-    if shape1 != b.shape:
-        raise ValueError("patterns are not of equal shape")
-    dot_prod = np.dot(a.flatten(), b.flatten())
-    return float(dot_prod) / (np.prod(shape1)) 
-
 def dice_coefficient(a,b):
     if not len(a) or not len(b): return 0.0
     """ quick case for true duplicates """
@@ -49,10 +40,7 @@ def dice_coefficient(a,b):
     return score
 
 def cos_sim(a, b):
-	"""Takes 2 vectors a, b and returns the cosine similarity according 
-	to the definition of the dot product
-	"""
-	dot_product = np.dot(a, b)
-	norm_a = np.linalg.norm(a)
-	norm_b = np.linalg.norm(b)
-	return dot_product / (norm_a * norm_b)
+    dot_product = np.dot(a, b)
+    norm_a = np.linalg.norm(a)
+    norm_b = np.linalg.norm(b)
+    return dot_product / (norm_a * norm_b)
