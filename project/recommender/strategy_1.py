@@ -3,7 +3,7 @@ from . import helper
 RECOMMENDATION_COUNT = 10
 
 def calc_sim(row):
-    sim = row['genre_sim']
+    sim = row['genre_sim'] + row['popularity_sim']
     return sim
 
 # Genres and Popularity

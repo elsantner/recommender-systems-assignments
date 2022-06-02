@@ -94,8 +94,8 @@ if __name__ == "__main__":
 
         print('\nRECOMMENDATIONS (5):')
         rec = RecommenderStrategy5(data=md, sample_size=args.sample_size, rec_count=RECOMMENDATION_COUNT)
-        recommendations2 = rec.get_recommendations(args.movie_id)
-        print(recommendations2[['id', 'title', 'release_year', 'genres', 'cast', 'sim']])
+        recommendations5 = rec.get_recommendations(args.movie_id)
+        print(recommendations5[['id', 'title', 'release_year', 'genres', 'cast', 'sim']])
 
     # TODO: reactive error handling once development/debugging is finished
     # except (ValueError, KeyError) as e:
