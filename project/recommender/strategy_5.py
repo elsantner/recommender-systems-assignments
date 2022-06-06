@@ -4,7 +4,6 @@ RELEASE_YEAR_DIFF = 2
 RECOMMENDATION_COUNT = 10
 
 
-# if previous similarity
 def calc_sim(row):
     # works well if enough movies with genre_sim > 0 and actor_sim > 0, otherwise many 0 values
     sim = row['genre_sim'] * row['actor_sim']
