@@ -74,7 +74,7 @@ if __name__ == "__main__":
         print('\nReference movie:')
         print(md.get_movie_metadata_single(args.movie_id)[['id', 'title', 'popularity', 'genres', 'cast']])
 
-        print('\nRECOMMENDATIONS (1):')
+        print('\nRECOMMENDATIONS (1. Genre overlap & movie popularity):')
         rec = RecommenderStrategy1(data=md, sample_size=args.sample_size, rec_count=RECOMMENDATION_COUNT)
         recommendations1 = rec.get_recommendations(args.movie_id)
         # sort the top 10 recommendations of genre by their popularity
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         print('\nReference movie:')
         print(md.get_movie_metadata_single(args.movie_id)[['id', 'title', 'overview', 'genres']])
 
-        print('\nRECOMMENDATIONS (2):')
+        print('\nRECOMMENDATIONS (2. Title & Overview TF-IDF):')
         rec = RecommenderStrategy2(data=md, sample_size=args.sample_size, rec_count=RECOMMENDATION_COUNT)
         recommendations2 = rec.get_recommendations(args.movie_id)
         print(recommendations2[['id', 'title', 'overview', 'sim', 'genres']])
@@ -95,7 +95,7 @@ if __name__ == "__main__":
         print('\nReference movie:')
         print(md.get_movie_metadata_single(args.movie_id)[['id', 'title', 'director', 'genres', 'cast']])
 
-        print('\nRECOMMENDATIONS (3):')
+        print('\nRECOMMENDATIONS (3. Directors, actors & popularity):')
         rec = RecommenderStrategy3(data=md, sample_size=args.sample_size, rec_count=RECOMMENDATION_COUNT)
         recommendations3 = rec.get_recommendations(args.movie_id)
         # sort the top 10 recommendations of genre by their popularity
@@ -108,7 +108,7 @@ if __name__ == "__main__":
         print(md.get_movie_metadata_single(args.movie_id)[['id', 'title', 'runtime', 'original_language',
                                                            'production_countries', 'genres']])
 
-        print('\nRECOMMENDATIONS (4):')
+        print('\nRECOMMENDATIONS (4. Runtime, original language, production countries and genres):')
         rec = RecommenderStrategy4(data=md, sample_size=args.sample_size, rec_count=RECOMMENDATION_COUNT)
         recommendations4 = rec.get_recommendations(args.movie_id)
         print(recommendations4[['id', 'title', 'runtime', 'original_language', 'production_countries', 'genres', 'sim']])
@@ -117,7 +117,7 @@ if __name__ == "__main__":
         print('\nReference movie:')
         print(md.get_movie_metadata_single(args.movie_id)[['id', 'title', 'release_year', 'genres', 'cast']])
 
-        print('\nRECOMMENDATIONS (5):')
+        print('\nRECOMMENDATIONS (5. Actors, genres and release year):')
         rec = RecommenderStrategy5(data=md, sample_size=args.sample_size, rec_count=RECOMMENDATION_COUNT)
         recommendations5 = rec.get_recommendations(args.movie_id)
         print(recommendations5[['id', 'title', 'release_year', 'genres', 'cast', 'sim']])

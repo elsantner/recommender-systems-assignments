@@ -4,7 +4,7 @@
 # https://stackoverflow.com/questions/55677314/using-sklearn-how-do-i-calculate-the-tf-idf-cosine-similarity-between-documents/55682395#55682395
 from difflib import SequenceMatcher
 
-import nlp as nlp
+import sklearn
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from strsimpy.metric_lcs import MetricLCS
@@ -59,7 +59,8 @@ class RecommenderStrategy2:
         df = self.__sample_movie_df.copy()
         # remove mref from movie recommendations
         df = df.drop(df[df['id'] == mref_id].index)
-        vectorizer = TfidfVectorizer()
+        # ignore English stopwords (i.e. words that have no significant meaning, i.e. "a", "the", "in", etc.)
+        vectorizer = TfidfVectorizer(stop_words='english')
         docs_tfidf = vectorizer.fit_transform(df['overview'].tolist())
         df['title_sim'] = df['title'] \
             .apply(lambda c: get_similarity_lcs(c, mref['title']) if c == c else 0)
