@@ -1,11 +1,9 @@
-# Collaborative recommender implementation
 from . import helper
 
 RELEASE_YEAR_DIFF = 2
 RECOMMENDATION_COUNT = 10
 
 
-# if previous similarity
 def calc_sim(row):
     # works well if enough movies with genre_sim > 0 and actor_sim > 0, otherwise many 0 values
     sim = row['genre_sim'] * row['actor_sim']
@@ -33,7 +31,6 @@ class RecommenderStrategy5:
         else:
             self.__sample_movie_df = self.data.movies_df.sample(self.sample_size)
 
-    # recommendations based solely on genre overlap between movies and user profile (i.e. genres the user has liked)
     def get_recommendations(self, mref_id):
         # get reference movie metadata
         mref = self.data.get_movie_metadata_single(mref_id).iloc[0]
