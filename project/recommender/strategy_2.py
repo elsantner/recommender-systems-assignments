@@ -20,9 +20,9 @@ metric_lcs = MetricLCS()
 def get_similarity_lcs(str1, str2):
 
     # example for calculation
-    # LCS: ABCDEFG => length = 7
+    # LCS: ABCDEF => length = 6
     # longest = str2 => length = 10
-    # => 1 - 7/10 = 0.3
+    # => 1 - 6/10 = 0.4
     return(1-metric_lcs.distance(str1, str2))
 
 def get_tf_idf_query_similarity(vectorizer, docs_tfidf, query):
