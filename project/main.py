@@ -6,6 +6,7 @@ import movie_data
 from recommender.strategy_4 import RecommenderStrategy4
 from recommender.strategy_5 import RecommenderStrategy5
 from recommender.strategy_1 import RecommenderStrategy1
+from recommender.strategy_3 import RecommenderStrategy3
 from recommender.strategy_2 import RecommenderStrategy2
 
 
@@ -91,8 +92,16 @@ if __name__ == "__main__":
 
     # recommendation strategy 3
     if args.strategy in ('3', 'all'):
+        print('\nReference movie:')
+        print(md.get_movie_metadata_single(args.movie_id)[['id', 'title', 'director', 'genres', 'cast']])
+
         print('\nRECOMMENDATIONS (3):')
-        # TODO: implement recommendation strategy 3
+        rec = RecommenderStrategy3(data=md, sample_size=args.sample_size, rec_count=RECOMMENDATION_COUNT)
+        recommendations3 = rec.get_recommendations(args.movie_id)
+        # sort the top 10 recommendations of genre by their popularity
+        #recommendations3 = recommendations3.sort_values(by='popularity', ascending=False)
+        print(recommendations3[['id', 'title', 'director', 'genres', 'cast', 'director_sim']])
+        #print(recommendations3[['id', 'title', 'director', 'genres', 'cast', 'director_sim', 'cast_sim', 'sim']])
     # recommendation strategy 4
     if args.strategy in ('4', 'all'):
         print('\nReference movie:')
