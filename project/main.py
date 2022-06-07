@@ -5,6 +5,8 @@ import pandas as pd
 import movie_data
 from recommender.strategy_5 import RecommenderStrategy5
 from recommender.strategy_1 import RecommenderStrategy1
+from recommender.strategy_2 import RecommenderStrategy2
+
 
 
 RECOMMENDATION_COUNT = 10
@@ -76,9 +78,16 @@ if __name__ == "__main__":
         # sort the top 10 recommendations of genre by their popularity
         recommendations1 = recommendations1.sort_values(by='popularity', ascending=False)
         print(recommendations1[['id', 'title', 'popularity', 'genres', 'cast', 'sim']])
+
     if args.strategy in ('2', 'all'):
+        print('\nReference movie:')
+        print(md.get_movie_metadata_single(args.movie_id)[['id', 'title', 'overview', 'genres']])
+
         print('\nRECOMMENDATIONS (2):')
-        # TODO: implement recommendation strategy 2
+        rec = RecommenderStrategy2(data=md, sample_size=args.sample_size, rec_count=RECOMMENDATION_COUNT)
+        recommendations2 = rec.get_recommendations(args.movie_id)
+        print(recommendations2[['id', 'title', 'overview', 'sim', 'genres']])
+
     # recommendation strategy 3
     if args.strategy in ('3', 'all'):
         print('\nRECOMMENDATIONS (3):')

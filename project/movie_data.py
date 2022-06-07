@@ -40,7 +40,7 @@ class MovieData:
         df['release_year'] = df['release_date'].apply(
             lambda x: int(str(x).split('-')[0]) if x == x else 0)
         df['release_year'] = df['release_year'].astype('int')
-
+        df['overview'] = df['overview'].fillna('')
         return df
 
     def __read_ratings_df(self):
