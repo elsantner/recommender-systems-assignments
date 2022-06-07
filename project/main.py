@@ -85,10 +85,12 @@ if __name__ == "__main__":
         print('\nReference movie:')
         print(md.get_movie_metadata_single(args.movie_id)[['id', 'title', 'overview', 'genres']])
 
-        print('\nRECOMMENDATIONS (2. Title & Overview TF-IDF):')
+        print('\nRECOMMENDATIONS (2. Title LCS & Overview TF-IDF):')
         rec = RecommenderStrategy2(data=md, sample_size=args.sample_size, rec_count=RECOMMENDATION_COUNT)
         recommendations2 = rec.get_recommendations(args.movie_id)
         print(recommendations2[['id', 'title', 'overview', 'sim', 'genres']])
+        # additional possibility to add the values of title similarity and overview similarity in the results
+        # print(recommendations2[['id', 'title', 'overview', 'title_sim', 'overview_sim', 'sim', 'genres']])
 
     # recommendation strategy 3
     if args.strategy in ('3', 'all'):

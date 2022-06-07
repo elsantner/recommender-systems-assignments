@@ -4,7 +4,6 @@
 # https://stackoverflow.com/questions/55677314/using-sklearn-how-do-i-calculate-the-tf-idf-cosine-similarity-between-documents/55682395#55682395
 from difflib import SequenceMatcher
 
-import sklearn
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from strsimpy.metric_lcs import MetricLCS
@@ -13,16 +12,17 @@ RECOMMENDATION_COUNT = 10
 
 def calc_sim(row):
     # works well if enough movies with title_sim > 0 and overview_sim > 0, otherwise many 0 values
+    # combine / multiply title similarity and overview similarity
     sim = row['title_sim'] * row['overview_sim']
     return (sim)
-
 
 metric_lcs = MetricLCS()
 def get_similarity_lcs(str1, str2):
 
-    # LCS: ABCDEF => length = 6
-    # longest = s2 => length = 10
-    # => 1 - 6/10 = 0.4
+    # example for calculation
+    # LCS: ABCDEFG => length = 7
+    # longest = str2 => length = 10
+    # => 1 - 7/10 = 0.3
     return(1-metric_lcs.distance(str1, str2))
 
 def get_tf_idf_query_similarity(vectorizer, docs_tfidf, query):
@@ -30,11 +30,13 @@ def get_tf_idf_query_similarity(vectorizer, docs_tfidf, query):
     vectorizer: TfIdfVectorizer model
     docs_tfidf: tfidf vectors for all docs
     query: query doc
-
     return: cosine similarity between query and all docs
     """
+
     query_tfidf = vectorizer.transform([query])
     cosineSimilarities = cosine_similarity(query_tfidf, docs_tfidf).flatten()
+    # tf-idf: term frequency–inverse document frequency
+    # cosine sim: measures the similarity between two vectors
     return cosineSimilarities
 
 
