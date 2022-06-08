@@ -35,8 +35,11 @@ def get_tf_idf_query_similarity(vectorizer, docs_tfidf, query):
 
     query_tfidf = vectorizer.transform([query])
     cosineSimilarities = cosine_similarity(query_tfidf, docs_tfidf).flatten()
+    # query_tfidf is the vector of the reference movie
+    # docs_tfidf are the vectors og the other overviews
     # tf-idf: term frequency–inverse document frequency
     # cosine sim: measures the similarity between two vectors
+    # cosineSimilarities is a list of the similarities of the query to all other vectors (overviews)
     return cosineSimilarities
 
 
@@ -63,10 +66,13 @@ class RecommenderStrategy2:
         df = df.drop(df[df['id'] == mref_id].index)
         # ignore English stopwords (i.e. words that have no significant meaning, i.e. "a", "the", "in", etc.)
         vectorizer = TfidfVectorizer(stop_words='english')
+        # method to see which words are in the document and to vectorize all overviews
         docs_tfidf = vectorizer.fit_transform(df['overview'].tolist())
+        # for every entry in title call function get_similarity_lcs
+        # compute similarity of title and ref title
         df['title_sim'] = df['title'] \
-            .apply(lambda c: get_similarity_lcs(c, mref['title']) if c == c else 0)
-
+            .apply(lambda title: get_similarity_lcs(title, mref['title']) if title == title else 0)
+        # get similarity of ref title to ALL other overviews
         tf_idf_sim = get_tf_idf_query_similarity(vectorizer, docs_tfidf, mref['overview'])
         df['overview_sim'] = tf_idf_sim
 
