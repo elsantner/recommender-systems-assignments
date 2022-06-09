@@ -1,7 +1,6 @@
 from . import helper
 
 RUNTIME_DIFF_NO_PENALTY = 10
-RECOMMENDATION_COUNT = 10
 
 
 # consider runtime diff, language and prod country similarity as well as genre similarity
@@ -51,24 +50,19 @@ def calc_cosine_sim(row, mref_runtime):
 # irrelevant to the viewer.
 # Genres were included as this strategy (without genres) did not result in meaningful recommendations for en/USA movies.
 class RecommenderStrategy4:
-    def __init__(self, data, sample_size=-1, rec_count=10):
+    def __init__(self, data, rec_count=10):
         self.data = data
-        self.sample_size = sample_size
         self.rec_count = rec_count
-
-        # sample random user and movie IDs to reduce computation time
-        if self.sample_size == -1:
-            # no sampling required
-            self.__sample_movie_df = self.data.movies_df
-        else:
-            self.__sample_movie_df = self.data.movies_df.sample(self.sample_size)
 
     def get_recommendations(self, mref_id):
         # get reference movie metadata
         mref = self.data.get_movie_metadata_single(mref_id).iloc[0]
-        df = self.__sample_movie_df.copy()
+        df = self.data.movies_df.copy()
         # remove mref from movie recommendations
         df = df.drop(df[df['id'] == mref_id].index)
+
+        g = df.groupby('original_language')
+        print(g.groups.keys())
 
         # calculate absolute runtime difference
         df['runtime_diff'] = df['runtime'] \

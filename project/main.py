@@ -111,7 +111,7 @@ if __name__ == "__main__":
                                                            'production_countries', 'genres']])
 
         print('\nRECOMMENDATIONS (4. Runtime, original language, production countries and genres):')
-        rec = RecommenderStrategy4(data=md, sample_size=args.sample_size, rec_count=RECOMMENDATION_COUNT)
+        rec = RecommenderStrategy4(data=md, rec_count=RECOMMENDATION_COUNT)
         recommendations4 = rec.get_recommendations(args.movie_id)
         print(recommendations4[['id', 'title', 'runtime', 'original_language', 'production_countries', 'genres', 'sim']])
     # recommendation strategy 5
@@ -120,7 +120,7 @@ if __name__ == "__main__":
         print(md.get_movie_metadata_single(args.movie_id)[['id', 'title', 'release_year', 'genres', 'cast']])
 
         print('\nRECOMMENDATIONS (5. Actors, genres and release year):')
-        rec = RecommenderStrategy5(data=md, sample_size=args.sample_size, rec_count=RECOMMENDATION_COUNT)
+        rec = RecommenderStrategy5(data=md, rec_count=RECOMMENDATION_COUNT)
         recommendations5 = rec.get_recommendations(args.movie_id)
         print(recommendations5[['id', 'title', 'release_year', 'genres', 'cast', 'sim']])
 
