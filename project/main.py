@@ -113,7 +113,7 @@ if __name__ == "__main__":
         print('\nRECOMMENDATIONS (4. Runtime, original language, production countries and genres):')
         rec = RecommenderStrategy4(data=md, rec_count=RECOMMENDATION_COUNT)
         recommendations4 = rec.get_recommendations(args.movie_id)
-        print(recommendations4[['id', 'title', 'runtime', 'original_language', 'production_countries', 'genres', 'sim']])
+        print(recommendations4[['id', 'title', 'runtime', 'region', 'production_countries', 'genres', 'sim']])
     # recommendation strategy 5
     if args.strategy in ('5', 'all'):
         print('\nReference movie:')
