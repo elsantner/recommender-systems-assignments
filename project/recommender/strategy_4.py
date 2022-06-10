@@ -9,7 +9,7 @@ region_dict = {}
 # Replace language sim with region sim to allow for broader comparison
 # Remove runtime as studies have shown it is not important for user similarity rating
 # Adjust factor weighting for better results
-# replace multiplicative sim calculation by additive formula: seems to work better at ranking
+# Replace multiplicative sim calculation by additive formula: seems to work better for ranking
 
 
 # consider runtime diff, language and prod country similarity as well as genre similarity
