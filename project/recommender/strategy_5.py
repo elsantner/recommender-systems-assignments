@@ -1,46 +1,55 @@
 from . import helper
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
-RELEASE_YEAR_DIFF = 2
-RECOMMENDATION_COUNT = 10
+RELEASE_YEAR_DIFF = 5
+
+
+# Tuning:
+# Increase release year diff from 2 to 5: more movies for other metrics to work with
+# Introduce keyword_sim using TF-IDF: Allows for more fine-grain comparison of the plot in addition to genres sim
+# Adjust factor weighting for better results
+# Replace multiplicative sim calculation by additive formula: seems to work better for ranking
 
 
 def calc_sim(row):
-    # works well if enough movies with genre_sim > 0 and actor_sim > 0, otherwise many 0 values
-    sim = row['genre_sim'] * row['actor_sim']
-    if sim == 0:
-        # replace 0 values by adding up remaining similarities
-        return row['genre_sim'] + row['actor_sim']
-    else:
-        # add 10 to keep them at the top of the sorted list
-        return sim + 10
+    sim = row['keyword_sim'] + row['actor_sim'] + (0.5 * row['genre_sim'])
+    return sim + (row['popularity'] * 0.001)
+
+
+# Return a vector of cosine similarities between docs_tfidf and query
+def get_tf_idf_sim(vectorizer, docs_tfidf, query):
+    query_tfidf = vectorizer.transform([query])
+    return cosine_similarity(query_tfidf, docs_tfidf).flatten()
 
 
 # Actors, genres and release year
 # Select movies within a similar release time frame to mref, e.g. +/- 2 years.
 # Sort these movies by actor and genre similarity (using Cosine or Jaccard-based similarity measures).
 class RecommenderStrategy5:
-    def __init__(self, data, sample_size=-1, rec_count=10):
+    def __init__(self, data, rec_count=10):
         self.data = data
-        self.sample_size = sample_size
         self.rec_count = rec_count
-
-        # sample random user and movie IDs to reduce computation time
-        if self.sample_size == -1:
-            # no sampling required
-            self.__sample_movie_df = self.data.movies_df
-        else:
-            self.__sample_movie_df = self.data.movies_df.sample(self.sample_size)
 
     def get_recommendations(self, mref_id):
         # get reference movie metadata
         mref = self.data.get_movie_metadata_single(mref_id).iloc[0]
-        df = self.__sample_movie_df.copy()
+        df = self.data.movies_df.copy()
         # remove mref from movie recommendations
         df = df.drop(df[df['id'] == mref_id].index)
 
+        # filter out "genre-incompatible" movies
+        df = helper.filter_by_genre_rules(df, mref)
+
+        # filter out movies not in the release year threshold
         mref_release_year = mref['release_year']
         release_filtered_df = df.loc[(df['release_year'] >= mref_release_year - RELEASE_YEAR_DIFF) &
                                      (df['release_year'] <= mref_release_year + RELEASE_YEAR_DIFF)].copy()
+
+        # create and fit TF-IDF vectorizer, and create transform for all keywords
+        vectorizer = TfidfVectorizer(stop_words='english')
+        keywords_tfidf = vectorizer.fit_transform(release_filtered_df['keywords'].tolist())
+        release_filtered_df['keyword_sim'] = get_tf_idf_sim(vectorizer, keywords_tfidf, mref['keywords'])
 
         # calculate genre similarity between mref and each movie
         # if a movie has no genres set (if NaN), then set to 0

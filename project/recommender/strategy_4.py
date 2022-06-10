@@ -1,45 +1,57 @@
 from . import helper
 
 RUNTIME_DIFF_NO_PENALTY = 10
-RECOMMENDATION_COUNT = 10
+
+region_dict = {}
+
+
+# Tuning:
+# Replace language sim with region sim to allow for broader comparison
+# Remove runtime as studies have shown it is not important for user similarity rating
+# Adjust factor weighting for better results
+# Replace multiplicative sim calculation by additive formula: seems to work better for ranking
 
 
 # consider runtime diff, language and prod country similarity as well as genre similarity
 def calc_sim(row):
-    # if one of the factors is 0, retry with one less factor (in order of increasing importance)
-    # multiply by 10^n to distinguish results in sorted list (i.e. prefer results with more factors used)
-    factor = 1000
-    sim = (get_runtime_factor(row['runtime_diff']) * row['lang_sim'] * row['prod_country_sim'] * row['genre_sim']) * factor
-    if sim == 0:
-        factor = 100
-        sim = (get_runtime_factor(row['runtime_diff']) * row['lang_sim'] * row['prod_country_sim']) * factor
-        if sim == 0:
-            factor = 10
-            sim = get_runtime_factor(row['runtime_diff'] * row['lang_sim']) * factor
-            if sim == 0:
-                factor = 1
-                sim = get_runtime_factor(row['runtime_diff']) * factor
-
-    # include popularity ranking to create an order within "categories" of results
-    # (i.e. movies with have the same similarity score)
-    # adapt to factor used in calculation to avoid high popularity boosting movies
-    # which did not fulfill ranking criteria
-    return sim + (row['popularity'] * factor * 0.001)
+    sim = (0.5 * row['region_sim']) + (0.1 * row['prod_country_sim']) + row['genre_sim']
+    return sim + (row['popularity'] * 0.001)
 
 
-# If the runtime difference if within 'RUNTIME_DIFF_NO_PENALTY', then 1 is returned
-# Otherwise, the return value converges to 0 with growing runtime difference
-def get_runtime_factor(runtime_diff):
-    if runtime_diff <= RUNTIME_DIFF_NO_PENALTY:
-        return 1
-    return 1 / (runtime_diff - RUNTIME_DIFF_NO_PENALTY)
+def init_region_dict():
+    for lang in ('ab', 'bg', 'bs', 'hr', 'hu', 'ka', 'mk', 'ro', 'sh', 'sq'):
+        region_dict[lang] = 'eastern european'
+    for lang in ('eo', 'la'):
+        region_dict[lang] = 'special'
+    for lang in ('ca', 'el', 'es', 'eu', 'fr', 'gl', 'it', 'pt', 'ay', 'qu'):
+        region_dict[lang] = 'latin'
+    for lang in ('et', 'fi', 'is', 'iu', 'lt', 'lv', 'nb', 'no', 'sv'):
+        region_dict[lang] = 'northern european'
+    for lang in ('cs', 'da', 'de', 'fy', 'lb', 'nl', 'pl'):
+        region_dict[lang] = 'central european'
+    for lang in ('af', 'am', 'bm', 'rw', 'wo', 'zu'):
+        region_dict[lang] = 'african'
+    for lang in ('ar', 'fa', 'he', 'hy', 'ku', 'mt', 'ps', 'tg', 'tr'):
+        region_dict[lang] = 'middle eastern'
+    for lang in (
+            'bn', 'bo', 'cn', 'hi', 'kn', 'lo', 'ml', 'mn', 'mr', 'ms', 'ne', 'pa', 'si', 'ta', 'te', 'th', 'ur', 'vi',
+            'zh'):
+        region_dict[lang] = 'central asian'
+    for lang in ('ja', 'ko'):
+        region_dict[lang] = 'korea/japan'
+    for lang in ('id', 'jv', 'sm', 'tl'):
+        region_dict[lang] = 'pacific'
+    for lang in ('kk', 'ky', 'ru', 'sl', 'sk', 'sr', 'uk', 'uz'):
+        region_dict[lang] = 'slavic'
+    for lang in ('en', 'cy'):
+        region_dict[lang] = 'english'
+    region_dict['xx'] = 'no language'
 
 
-# currently unused
-def calc_cosine_sim(row, mref_runtime):
-    v1 = [row['runtime'], row['lang_sim'], row['prod_country_sim']]
-    v2 = [mref_runtime, 1, 1]
-    return helper.cos_sim(v1, v2)
+def get_region(row):
+    if row['original_language'] != row['original_language']:
+        return 'unknown'
+    return region_dict[row['original_language']]
 
 
 # Runtime, original language and production countries
@@ -51,39 +63,31 @@ def calc_cosine_sim(row, mref_runtime):
 # irrelevant to the viewer.
 # Genres were included as this strategy (without genres) did not result in meaningful recommendations for en/USA movies.
 class RecommenderStrategy4:
-    def __init__(self, data, sample_size=-1, rec_count=10):
+    def __init__(self, data, rec_count=10):
         self.data = data
-        self.sample_size = sample_size
         self.rec_count = rec_count
-
-        # sample random user and movie IDs to reduce computation time
-        if self.sample_size == -1:
-            # no sampling required
-            self.__sample_movie_df = self.data.movies_df
-        else:
-            self.__sample_movie_df = self.data.movies_df.sample(self.sample_size)
+        init_region_dict()
 
     def get_recommendations(self, mref_id):
         # get reference movie metadata
         mref = self.data.get_movie_metadata_single(mref_id).iloc[0]
-        df = self.__sample_movie_df.copy()
+        df = self.data.movies_df.copy()
         # remove mref from movie recommendations
         df = df.drop(df[df['id'] == mref_id].index)
 
-        # calculate absolute runtime difference
-        df['runtime_diff'] = df['runtime'] \
-            .apply(lambda r: abs(r - mref['runtime']) if r == r else 9999)
+        # filter out "genre-incompatible" movies
+        df = helper.filter_by_genre_rules(df, mref)
 
-        df['lang_sim'] = df['original_language'].apply(lambda l: l == mref['original_language'])
+        mref['region'] = get_region(mref)
+        df['region'] = df.apply(get_region, axis=1)
+
+        df['region_sim'] = df['region'].apply(lambda l: l == mref['region'])
 
         df['prod_country_sim'] = df['production_countries'] \
             .apply(lambda c: helper.jaccard_similarity(c, mref['production_countries']) if c == c else 0)
 
         df['genre_sim'] = df['genres'] \
             .apply(lambda g: helper.jaccard_similarity(g, mref['genres']) if g == g else 0)
-
-        # does not work well: prefers movies with exactly the same runtime
-        # df['sim'] = df.apply(lambda row: calc_cosine_sim(row, mref['runtime']), axis=1)
 
         df['sim'] = df.apply(calc_sim, axis=1)
 

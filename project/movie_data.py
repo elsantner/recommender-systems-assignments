@@ -32,6 +32,7 @@ class MovieData:
     def __read_movies_df(self):
         df = read_dat_file(self.path + "/movies_tmdbMeta.csv", cols=movie_columns)
 
+        df['id'] = df['id'].astype(int)
         df['genres'] = df['genres'].apply(parse_list)
         df['cast'] = df['cast'].apply(parse_list)
         df['production_countries'] = df['production_countries'].apply(parse_list)
@@ -41,6 +42,7 @@ class MovieData:
             lambda x: int(str(x).split('-')[0]) if x == x else 0)
         df['release_year'] = df['release_year'].astype('int')
         df['overview'] = df['overview'].fillna('')
+        df['keywords'] = df['keywords'].fillna('')
         return df
 
     def __read_ratings_df(self):
@@ -57,4 +59,4 @@ class MovieData:
         return self.movies_df.size
 
     def movie_exists(self, movie_id):
-        return movie_id in self.movies_df['id']
+        return movie_id in self.movies_df['id'].unique()
