@@ -9,33 +9,20 @@ region_dict = {}
 # Replace language sim with region sim to allow for broader comparison
 # Remove runtime as studies have shown it is not important for user similarity rating
 # Adjust factor weighting for better results
+# replace multiplicative sim calculation by additive formula: seems to work better at ranking
 
 
 # consider runtime diff, language and prod country similarity as well as genre similarity
 def calc_sim(row):
-    # if one of the factors is 0, retry with one less factor (in order of increasing importance)
-    # multiply by 10^n to distinguish results in sorted list (i.e. prefer results with more factors used)
-    factor = 1000
-    sim = (row['region_sim'] * (0.2 * row['prod_country_sim']) * row['genre_sim']) * factor
-    if sim == 0:
-        factor = 100
-        sim = (row['region_sim'] * (0.2 * row['prod_country_sim'])) * factor
-        if sim == 0:
-            factor = 10
-            sim = row['region_sim'] * factor
-
-    # include popularity ranking to create an order within "categories" of results
-    # (i.e. movies with have the same similarity score)
-    # adapt to factor used in calculation to avoid high popularity boosting movies
-    # which did not fulfill ranking criteria
-    return sim + (row['popularity'] * factor * 0.0005)
+    sim = (0.5 * row['region_sim']) + (0.1 * row['prod_country_sim']) + row['genre_sim']
+    return sim + (row['popularity'] * 0.001)
 
 
 def init_region_dict():
     for lang in ('ab', 'bg', 'bs', 'hr', 'hu', 'ka', 'mk', 'ro', 'sh', 'sq'):
         region_dict[lang] = 'eastern european'
     for lang in ('eo', 'la'):
-        region_dict[lang] = 'artificial'
+        region_dict[lang] = 'special'
     for lang in ('ca', 'el', 'es', 'eu', 'fr', 'gl', 'it', 'pt', 'ay', 'qu'):
         region_dict[lang] = 'latin'
     for lang in ('et', 'fi', 'is', 'iu', 'lt', 'lv', 'nb', 'no', 'sv'):
@@ -67,29 +54,6 @@ def get_region(row):
     return region_dict[row['original_language']]
 
 
-def filter_by_genre_rules(df, mref):
-    filtered_df = df.copy()
-    return filtered_df[filtered_df['genres'].map(lambda g: are_genres_compatible(g, mref['genres']))]
-
-
-# implement some business rules for genre compatibility
-def are_genres_compatible(g1, g2):
-    # avoid NaN values
-    if g1 != g1:
-        g1 = {}
-    if g2 != g2:
-        g2 = {}
-    intersect = set(g1).intersection(set(g2))
-    union = set(g1).union(set(g2))
-    # only recommend Family movies if mref is a Family movie
-    if 'Family' in union and 'Family' not in intersect:
-        return False
-    # Don't recommend a Drama for a Comedy and vice versa, except if both movies are labelled as both
-    if {'Comedy', 'Drama'}.issubset(union) and not {'Comedy', 'Drama'}.issubset(union):
-        return False
-    return True
-
-
 # Runtime, original language and production countries
 # Select movies which have a "similar" runtime (+/- n minutes),
 # the same original language and production countries. Rank by popularity.
@@ -112,7 +76,7 @@ class RecommenderStrategy4:
         df = df.drop(df[df['id'] == mref_id].index)
 
         # filter out "genre-incompatible" movies
-        df = filter_by_genre_rules(df, mref)
+        df = helper.filter_by_genre_rules(df, mref)
 
         mref['region'] = get_region(mref)
         df['region'] = df.apply(get_region, axis=1)
