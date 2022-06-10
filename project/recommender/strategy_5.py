@@ -1,17 +1,10 @@
 from . import helper
 
-RELEASE_YEAR_DIFF = 2
+RELEASE_YEAR_DIFF = 4
 
 
 def calc_sim(row):
-    # works well if enough movies with genre_sim > 0 and actor_sim > 0, otherwise many 0 values
-    sim = row['genre_sim'] * row['actor_sim']
-    if sim == 0:
-        # replace 0 values by adding up remaining similarities
-        return row['genre_sim'] + row['actor_sim']
-    else:
-        # add 10 to keep them at the top of the sorted list
-        return sim + 10
+    return row['keyword_sim'] + (0.5 * row['actor_sim']) + row['genre_sim']
 
 
 # Actors, genres and release year
@@ -29,12 +22,18 @@ class RecommenderStrategy5:
         # remove mref from movie recommendations
         df = df.drop(df[df['id'] == mref_id].index)
 
+        # filter out "genre-incompatible" movies
+        df = helper.filter_by_genre_rules(df, mref)
+
         mref_release_year = mref['release_year']
         release_filtered_df = df.loc[(df['release_year'] >= mref_release_year - RELEASE_YEAR_DIFF) &
                                      (df['release_year'] <= mref_release_year + RELEASE_YEAR_DIFF)].copy()
 
         # calculate genre similarity between mref and each movie
         # if a movie has no genres set (if NaN), then set to 0
+        release_filtered_df['keyword_sim'] = release_filtered_df['keywords'] \
+            .apply(lambda g: helper.jaccard_similarity(g, mref['keywords']) if g == g else 0)
+
         release_filtered_df['genre_sim'] = release_filtered_df['genres'] \
             .apply(lambda g: helper.jaccard_similarity(g, mref['genres']) if g == g else 0)
 

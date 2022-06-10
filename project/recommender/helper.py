@@ -70,6 +70,6 @@ def are_genres_compatible(g1, g2):
     if 'Family' in union and 'Family' not in intersect:
         return False
     # Don't recommend a Drama for a Comedy and vice versa, except if both movies are labelled as {'Comedy', 'Drama'}
-    if {'Comedy', 'Drama'}.issubset(union) and not {'Comedy', 'Drama'}.issubset(union):
+    if {'Comedy', 'Drama'}.issubset(union) and not {'Comedy', 'Drama'}.issubset(intersect):
         return False
     return True

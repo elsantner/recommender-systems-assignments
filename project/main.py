@@ -117,12 +117,12 @@ if __name__ == "__main__":
     # recommendation strategy 5
     if args.strategy in ('5', 'all'):
         print('\nReference movie:')
-        print(md.get_movie_metadata_single(args.movie_id)[['id', 'title', 'release_year', 'genres', 'cast']])
+        print(md.get_movie_metadata_single(args.movie_id)[['id', 'title', 'release_year', 'genres', 'keywords', 'cast']])
 
         print('\nRECOMMENDATIONS (5. Actors, genres and release year):')
         rec = RecommenderStrategy5(data=md, rec_count=RECOMMENDATION_COUNT)
         recommendations5 = rec.get_recommendations(args.movie_id)
-        print(recommendations5[['id', 'title', 'release_year', 'genres', 'cast', 'sim']])
+        print(recommendations5[['id', 'title', 'release_year', 'genres', 'keywords', 'cast', 'sim']])
 
     # TODO: reactive error handling once development/debugging is finished
     # except (ValueError, KeyError) as e:

@@ -34,6 +34,7 @@ class MovieData:
 
         df['genres'] = df['genres'].apply(parse_list)
         df['cast'] = df['cast'].apply(parse_list)
+        df['keywords'] = df['keywords'].apply(parse_list)
         df['production_countries'] = df['production_countries'].apply(parse_list)
         df.loc['release_date'] = pd.to_datetime(df['release_date'], errors='coerce')
         # x == x ... NaN check
