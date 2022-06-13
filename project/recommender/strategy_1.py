@@ -1,16 +1,11 @@
-from . import helper 
+from . import helper
 
 RECOMMENDATION_COUNT = 10
 
-def calc_sim(row):
-    sim = row['genre_sim'] + row['popularity_sim']
-    return sim
-
 # Genres and Popularity
 class RecommenderStrategy1:
-    def __init__(self, data, sample_size=-1, rec_count=10):
+    def __init__(self, data, rec_count=10):
         self.data = data
-        self.sample_size = sample_size
         self.rec_count = rec_count
 
     # recommendations based on genre and popularity
@@ -26,9 +21,14 @@ class RecommenderStrategy1:
         df['genre_sim'] = df['genres'] \
             .apply(lambda g: helper.dice_coefficient(g, mref['genres']) if g == g else 0)
 
-        df['popularity_sim'] = df['popularity'] \
-            .apply(lambda c: helper.cos_sim(c, mref['popularity']) if c == c else 0)
+        # take the first 50 movies with the highest sim score and from them clean all the sequels
+        df = df.sort_values(by='genre_sim', ascending=False).head(50)
 
-        df['sim'] = df.apply(calc_sim, axis=1)
+        # drop duplicate ids because the dataset has some problems with that
+        df = df.loc[df['id'].astype(str).drop_duplicates().index]
 
-        return df.sort_values(by='sim', ascending=False).head(self.rec_count)
+        # try to minimize the sequels recommendations by drop all the movies
+        # from recommendations that have the same cast
+        df = df.loc[df['cast'].astype(str).drop_duplicates().index]
+
+        return df.sort_values(by='genre_sim', ascending=False).head(self.rec_count)

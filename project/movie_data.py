@@ -43,6 +43,7 @@ class MovieData:
         df['release_year'] = df['release_year'].astype('int')
         df['overview'] = df['overview'].fillna('')
         df['keywords'] = df['keywords'].fillna('')
+        df['popularity'] = df['popularity'].fillna(0)
         return df
 
     def __read_ratings_df(self):

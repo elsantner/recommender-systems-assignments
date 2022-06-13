@@ -3,11 +3,16 @@ from . import helper
 RECOMMENDATION_COUNT = 10
 
 def calc_sim(row):
-    if row['director_sim'] >= 0.9:
-        sim = row['director_sim'] + row['cast_sim']
+    if row['director_sim'] >= 0.9 and row['genre_sim'] > 0.5:
+        sim = row['director_sim'] + row['genre_sim']
+        return sim
+    elif row['cast_sim'] >= 0.5 and row['genre_sim'] > 0.5:
+        sim = row['cast_sim'] + row['genre_sim']
+        return sim
     else:
-        sim = row['cast_sim']
-    return sim
+        sim = row['genre_sim']
+        return sim
+
 
 # Genres and Popularity
 class RecommenderStrategy3:
@@ -29,9 +34,12 @@ class RecommenderStrategy3:
         df['director_sim'] = df['director'] \
             .apply(lambda g: helper.jaccard_similarity(g, mref['director']) if g == g else 0)
 
-        # df['cast_sim'] = df['cast'] \
-        #      .apply(lambda c: helper.jaccard_similarity(c, mref['cast']) if c == c else 0)
-        #
-        # df['sim'] = df.apply(calc_sim, axis=1)
+        df['cast_sim'] = df['cast'] \
+            .apply(lambda c: helper.jaccard_similarity(c, mref['cast']) if c == c else 0)
 
-        return df.sort_values(by='director_sim', ascending=False).head(self.rec_count)
+        df['genre_sim'] = df['genres'] \
+            .apply(lambda g: helper.dice_coefficient(g, mref['genres']) if g == g else 0)
+
+        df['sim'] = df.apply(calc_sim, axis=1)
+
+        return df.sort_values(by='sim', ascending=False).head(self.rec_count)

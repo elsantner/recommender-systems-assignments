@@ -75,11 +75,11 @@ if __name__ == "__main__":
         print(md.get_movie_metadata_single(args.movie_id)[['id', 'title', 'popularity', 'genres', 'cast']])
 
         print('\nRECOMMENDATIONS (1. Genre overlap & movie popularity):')
-        rec = RecommenderStrategy1(data=md, sample_size=args.sample_size, rec_count=RECOMMENDATION_COUNT)
+        rec = RecommenderStrategy1(data=md, rec_count=RECOMMENDATION_COUNT)
         recommendations1 = rec.get_recommendations(args.movie_id)
         # sort the top 10 recommendations of genre by their popularity
         recommendations1 = recommendations1.sort_values(by='popularity', ascending=False)
-        print(recommendations1[['id', 'title', 'popularity', 'genres', 'cast', 'sim']])
+        print(recommendations1[['id', 'title', 'popularity', 'genres', 'cast', 'genre_sim']])
 
     if args.strategy in ('2', 'all'):
         print('\nReference movie:')
@@ -102,7 +102,7 @@ if __name__ == "__main__":
         recommendations3 = rec.get_recommendations(args.movie_id)
         # sort the top 10 recommendations of genre by their popularity
         #recommendations3 = recommendations3.sort_values(by='popularity', ascending=False)
-        print(recommendations3[['id', 'title', 'director', 'genres', 'cast', 'director_sim']])
+        print(recommendations3[['id', 'title', 'director', 'genres', 'cast', 'director_sim', 'cast_sim', 'sim']])
         #print(recommendations3[['id', 'title', 'director', 'genres', 'cast', 'director_sim', 'cast_sim', 'sim']])
     # recommendation strategy 4
     if args.strategy in ('4', 'all'):
