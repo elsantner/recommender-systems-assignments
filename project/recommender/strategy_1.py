@@ -23,6 +23,8 @@ class RecommenderStrategy1:
 
         # take the first 50 movies with the highest sim score and from them clean all the sequels
         df = df.sort_values(by='genre_sim', ascending=False).head(50)
+        # sort them by popularity so we can keep the movie from the sequels with the highest popularity
+        df = df.sort_values(by='popularity', ascending=False)
 
         # drop duplicate ids because the dataset has some problems with that
         df = df.loc[df['id'].astype(str).drop_duplicates().index]
