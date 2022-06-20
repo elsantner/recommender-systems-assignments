@@ -1,6 +1,5 @@
 from . import helper
 
-RECOMMENDATION_COUNT = 10
 
 def calc_sim(row):
     if row['director_sim'] >= 0.9 and row['genre_sim'] > 0.5:
@@ -16,9 +15,8 @@ def calc_sim(row):
 
 # Genres and Popularity
 class RecommenderStrategy3:
-    def __init__(self, data, sample_size=-1, rec_count=10):
+    def __init__(self, data, rec_count=10):
         self.data = data
-        self.sample_size = sample_size
         self.rec_count = rec_count
 
     # recommendations based on genre and popularity

@@ -4,7 +4,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 RELEASE_YEAR_DIFF = 5
 
-
 # Tuning:
 # Increase release year diff from 2 to 5: more movies for other metrics to work with
 # Introduce keyword_sim using TF-IDF: Allows for more fine-grain comparison of the plot in addition to genres sim

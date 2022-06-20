@@ -1,9 +1,7 @@
 from . import helper
 
 RUNTIME_DIFF_NO_PENALTY = 10
-
 region_dict = {}
-
 
 # Tuning:
 # Replace language sim with region sim to allow for broader comparison

@@ -8,22 +8,23 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from strsimpy.metric_lcs import MetricLCS
 
-RECOMMENDATION_COUNT = 10
+metric_lcs = MetricLCS()
+
 
 def calc_sim(row):
     # works well if enough movies with title_sim > 0 and overview_sim > 0, otherwise many 0 values
     # combine / multiply title similarity and overview similarity
     sim = row['title_sim'] * row['overview_sim']
-    return (sim)
+    return sim
 
-metric_lcs = MetricLCS()
+
 def get_similarity_lcs(str1, str2):
-
     # example for calculation
     # LCS: ABCDEF => length = 6
     # longest = str2 => length = 10
     # => 1 - 6/10 = 0.4
-    return(1-metric_lcs.distance(str1, str2))
+    return 1 - metric_lcs.distance(str1, str2)
+
 
 def get_tf_idf_query_similarity(vectorizer, docs_tfidf, query):
     """
@@ -45,23 +46,15 @@ def get_tf_idf_query_similarity(vectorizer, docs_tfidf, query):
 
 # similarity of title (LCS)
 class RecommenderStrategy2:
-    def __init__(self, data, sample_size=-1, rec_count=10):
+    def __init__(self, data, rec_count=10):
         self.data = data
-        self.sample_size = sample_size
         self.rec_count = rec_count
 
-        # sample random user and movie IDs to reduce computation time
-        if self.sample_size == -1:
-            # no sampling required
-            self.__sample_movie_df = self.data.movies_df
-        else:
-            self.__sample_movie_df = self.data.movies_df.sample(self.sample_size)
-
- # recommendations based similarity of title
+    # recommendations based similarity of title
     def get_recommendations(self, mref_id):
         # get reference movie metadata
         mref = self.data.get_movie_metadata_single(mref_id).iloc[0]
-        df = self.__sample_movie_df.copy()
+        df = self.data.movies_df.copy()
         # remove mref from movie recommendations
         df = df.drop(df[df['id'] == mref_id].index)
         # ignore English stopwords (i.e. words that have no significant meaning, i.e. "a", "the", "in", etc.)

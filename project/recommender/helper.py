@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+
 def jaccard_similarity(x, y):
     # convert to set
     a = set(x)
@@ -73,4 +74,3 @@ def are_genres_compatible(g1, g2):
     if {'Comedy', 'Drama'}.issubset(union) and not {'Comedy', 'Drama'}.issubset(intersect):
         return False
     return True
-

@@ -1,7 +1,5 @@
 from . import helper
 
-RECOMMENDATION_COUNT = 10
-
 # Genres and Popularity
 class RecommenderStrategy1:
     def __init__(self, data, rec_count=10):
