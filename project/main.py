@@ -100,9 +100,8 @@ if __name__ == "__main__":
             print('\nRECOMMENDATIONS (3. Directors, actors & popularity):')
             rec = RecommenderStrategy3(data=md, rec_count=RECOMMENDATION_COUNT)
             recommendations3 = rec.get_recommendations(args.movie_id)
-            # sort the top 10 recommendations of genre by their popularity
-            #recommendations3 = recommendations3.sort_values(by='popularity', ascending=False)
-            print(recommendations3[['id', 'title', 'director', 'genres', 'cast', 'director_sim', 'cast_sim', 'sim']])
+            print(recommendations3[['id', 'title', 'director', 'genres', 'cast', 'genre_sim', 'director_sim', 'cast_sim', 'sim']])
+
         # recommendation strategy 4
         if args.strategy in ('4', 'all'):
             print('\nReference movie:')

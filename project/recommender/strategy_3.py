@@ -2,24 +2,17 @@ from . import helper
 
 
 def calc_sim(row):
-    if row['director_sim'] >= 0.9 and row['genre_sim'] > 0.5:
-        sim = row['director_sim'] + row['genre_sim']
-        return sim
-    elif row['cast_sim'] >= 0.5 and row['genre_sim'] > 0.5:
-        sim = row['cast_sim'] + row['genre_sim']
-        return sim
-    else:
-        sim = row['genre_sim']
-        return sim
+    sim = row['genre_sim'] + row['director_sim']*1.5 + row['cast_sim']*1.5
+    return sim
 
 
-# Genres and Popularity
+# Director, cast and genre
 class RecommenderStrategy3:
     def __init__(self, data, rec_count=10):
         self.data = data
         self.rec_count = rec_count
 
-    # recommendations based on genre and popularity
+    # recommendations based on director, cast and genre
     def get_recommendations(self, mref_id):
         # get reference movie metadata
         mref = self.data.get_movie_metadata_single(mref_id).iloc[0]
@@ -27,8 +20,6 @@ class RecommenderStrategy3:
         # remove mref from movie recommendations
         df = df.drop(df[df['id'] == mref_id].index)
 
-        # calculate genre similarity between mref and each movie
-        # if a movie has no genres set (if NaN), then set to 0
         df['director_sim'] = df['director'] \
             .apply(lambda g: helper.jaccard_similarity(g, mref['director']) if g == g else 0)
 
@@ -37,6 +28,13 @@ class RecommenderStrategy3:
 
         df['genre_sim'] = df['genres'] \
             .apply(lambda g: helper.dice_coefficient(g, mref['genres']) if g == g else 0)
+
+        # drop duplicate ids because the dataset has some problems with that
+        df = df.loc[df['id'].astype(str).drop_duplicates().index]
+
+        # try to minimize the sequels recommendations by drop all the movies
+        # from recommendations that have the same cast
+        df = df.loc[df['cast'].astype(str).drop_duplicates().index]
 
         df['sim'] = df.apply(calc_sim, axis=1)
 
