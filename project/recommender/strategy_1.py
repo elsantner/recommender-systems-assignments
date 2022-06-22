@@ -9,7 +9,7 @@ class RecommenderStrategy1:
     # recommendations based on genre and popularity
     def get_recommendations(self, mref_id):
         # get reference movie metadata
-        mref = self.data.get_movie_metadata_single(mref_id).iloc[0]
+        mref = self.data.get_movie_metadata(mref_id)
         df = self.data.movies_df.copy()
         # remove mref from movie recommendations
         df = df.drop(df[df['id'] == mref_id].index)

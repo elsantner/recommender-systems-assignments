@@ -68,7 +68,7 @@ if __name__ == "__main__":
         # Use 'args.movie_id' and 'md' to generate recommendations
         # recommendation strategy 1
 
-        mref = md.get_movie_metadata_single(args.movie_id)
+        mref = md.get_movie_metadata(args.movie_id)
 
         if args.strategy in ('1', 'all'):
             print('\nReference movie:')

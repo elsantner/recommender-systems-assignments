@@ -13,6 +13,7 @@ region_dict = {}
 # consider runtime diff, language and prod country similarity as well as genre similarity
 def calc_sim(row):
     sim = (0.5 * row['region_sim']) + (0.1 * row['prod_country_sim']) + row['genre_sim']
+    # add "a touch of popularity" to avoid niche results
     return sim + (row['popularity'] * 0.001)
 
 
@@ -68,7 +69,7 @@ class RecommenderStrategy4:
 
     def get_recommendations(self, mref_id):
         # get reference movie metadata
-        mref = self.data.get_movie_metadata_single(mref_id).iloc[0]
+        mref = self.data.get_movie_metadata(mref_id)
         df = self.data.movies_df.copy()
         # remove mref from movie recommendations
         df = df.drop(df[df['id'] == mref_id].index)

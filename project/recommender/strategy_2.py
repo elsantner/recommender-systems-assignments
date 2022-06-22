@@ -8,9 +8,10 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from strsimpy.metric_lcs import MetricLCS
 
-from project.recommender import helper
+from recommender import helper
 
 metric_lcs = MetricLCS()
+
 
 # consider overview similarity and genre similarity
 def calc_sim(row):
@@ -18,20 +19,21 @@ def calc_sim(row):
     # same weight of overview similarity and genre similarity
     return sim
 
+
 # def calc_sim(row):
-        # works well if enough movies with title_sim > 0 and overview_sim > 0, otherwise many 0 values
-        # combine / multiply title similarity and overview similarity
-    # sim = row['title_sim'] * row['overview_sim']
-    # return sim
-        # not used due to bad results
+# works well if enough movies with title_sim > 0 and overview_sim > 0, otherwise many 0 values
+# combine / multiply title similarity and overview similarity
+# sim = row['title_sim'] * row['overview_sim']
+# return sim
+# not used due to bad results
 
 # def get_similarity_lcs(str1, str2):
-    # example for calculation
-    # LCS: ABCDEF => length = 6
-    # longest = str2 => length = 10
-    # => 1 - 6/10 = 0.4
-    # return 1 - metric_lcs.distance(str1, str2)
-        # not used due to bad results
+# example for calculation
+# LCS: ABCDEF => length = 6
+# longest = str2 => length = 10
+# => 1 - 6/10 = 0.4
+# return 1 - metric_lcs.distance(str1, str2)
+# not used due to bad results
 
 def get_tf_idf_query_similarity(vectorizer, docs_tfidf, query):
     """
@@ -60,7 +62,7 @@ class RecommenderStrategy2:
     # recommendations based similarity of title
     def get_recommendations(self, mref_id):
         # get reference movie metadata
-        mref = self.data.get_movie_metadata_single(mref_id).iloc[0]
+        mref = self.data.get_movie_metadata(mref_id)
         df = self.data.movies_df.copy()
 
         # filter out "genre-incompatible" movies
@@ -75,7 +77,7 @@ class RecommenderStrategy2:
         # for every entry in title call function get_similarity_lcs
         # compute similarity of title and ref title
         # df['title_sim'] = df['title'] \
-            # .apply(lambda title: get_similarity_lcs(title, mref['title']) if title == title else 0)
+        # .apply(lambda title: get_similarity_lcs(title, mref['title']) if title == title else 0)
         # get similarity of ref title to ALL other overviews
 
         tf_idf_sim = get_tf_idf_query_similarity(vectorizer, docs_tfidf, mref['overview'])

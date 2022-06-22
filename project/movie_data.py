@@ -49,12 +49,8 @@ class MovieData:
     def __read_ratings_df(self):
         return read_dat_file(self.path + "/ratings_small.csv")
 
-    # get movie metadata
-    def get_movie_metadata(self, movie_ids_df):
-        return pd.merge(movie_ids_df, self.movies_df, on='id', how='inner')
-
-    def get_movie_metadata_single(self, movie_id):
-        return self.movies_df.loc[self.movies_df['id'] == movie_id]
+    def get_movie_metadata(self, movie_id):
+        return self.movies_df.loc[self.movies_df['id'] == movie_id].iloc[0]
 
     def get_movie_count(self):
         return self.movies_df.size
