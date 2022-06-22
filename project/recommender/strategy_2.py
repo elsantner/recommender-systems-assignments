@@ -8,23 +8,30 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from strsimpy.metric_lcs import MetricLCS
 
+from project.recommender import helper
+
 metric_lcs = MetricLCS()
 
-
+# consider overview similarity and genre similarity
 def calc_sim(row):
-    # works well if enough movies with title_sim > 0 and overview_sim > 0, otherwise many 0 values
-    # combine / multiply title similarity and overview similarity
-    sim = row['title_sim'] * row['overview_sim']
+    sim = row['overview_sim'] * row['genre_sim']
+    # same weight of overview similarity and genre similarity
     return sim
 
+# def calc_sim(row):
+        # works well if enough movies with title_sim > 0 and overview_sim > 0, otherwise many 0 values
+        # combine / multiply title similarity and overview similarity
+    # sim = row['title_sim'] * row['overview_sim']
+    # return sim
+        # not used due to bad results
 
-def get_similarity_lcs(str1, str2):
+# def get_similarity_lcs(str1, str2):
     # example for calculation
     # LCS: ABCDEF => length = 6
     # longest = str2 => length = 10
     # => 1 - 6/10 = 0.4
-    return 1 - metric_lcs.distance(str1, str2)
-
+    # return 1 - metric_lcs.distance(str1, str2)
+        # not used due to bad results
 
 def get_tf_idf_query_similarity(vectorizer, docs_tfidf, query):
     """
@@ -56,6 +63,10 @@ class RecommenderStrategy2:
         mref = self.data.get_movie_metadata_single(mref_id).iloc[0]
         df = self.data.movies_df.copy()
         # remove mref from movie recommendations
+
+        # filter out "genre-incompatible" movies
+        df = helper.filter_by_genre_rules(df, mref)
+
         df = df.drop(df[df['id'] == mref_id].index)
         # ignore English stopwords (i.e. words that have no significant meaning, i.e. "a", "the", "in", etc.)
         vectorizer = TfidfVectorizer(stop_words='english')
@@ -63,11 +74,14 @@ class RecommenderStrategy2:
         docs_tfidf = vectorizer.fit_transform(df['overview'].tolist())
         # for every entry in title call function get_similarity_lcs
         # compute similarity of title and ref title
-        df['title_sim'] = df['title'] \
-            .apply(lambda title: get_similarity_lcs(title, mref['title']) if title == title else 0)
+        # df['title_sim'] = df['title'] \
+            # .apply(lambda title: get_similarity_lcs(title, mref['title']) if title == title else 0)
         # get similarity of ref title to ALL other overviews
         tf_idf_sim = get_tf_idf_query_similarity(vectorizer, docs_tfidf, mref['overview'])
         df['overview_sim'] = tf_idf_sim
+
+        df['genre_sim'] = df['genres'] \
+            .apply(lambda g: helper.jaccard_similarity(g, mref['genres']) if g == g else 0)
 
         df['sim'] = df.apply(calc_sim, axis=1)
 

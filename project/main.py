@@ -85,7 +85,7 @@ if __name__ == "__main__":
             print('\nReference movie:')
             print(md.get_movie_metadata_single(args.movie_id)[['id', 'title', 'overview', 'genres']])
 
-            print('\nRECOMMENDATIONS (2. Title LCS & Overview TF-IDF):')
+            print('\nRECOMMENDATIONS (2. Overview TF-IDF):')
             rec = RecommenderStrategy2(data=md, rec_count=RECOMMENDATION_COUNT)
             recommendations2 = rec.get_recommendations(args.movie_id)
             print(recommendations2[['id', 'title', 'overview', 'sim', 'genres']])
