@@ -62,21 +62,22 @@ class RecommenderStrategy2:
         # get reference movie metadata
         mref = self.data.get_movie_metadata_single(mref_id).iloc[0]
         df = self.data.movies_df.copy()
-        # remove mref from movie recommendations
 
         # filter out "genre-incompatible" movies
         df = helper.filter_by_genre_rules(df, mref)
-
+        # remove mref from movie recommendations
         df = df.drop(df[df['id'] == mref_id].index)
         # ignore English stopwords (i.e. words that have no significant meaning, i.e. "a", "the", "in", etc.)
         vectorizer = TfidfVectorizer(stop_words='english')
         # method to see which words are in the document and to vectorize all overviews
         docs_tfidf = vectorizer.fit_transform(df['overview'].tolist())
+
         # for every entry in title call function get_similarity_lcs
         # compute similarity of title and ref title
         # df['title_sim'] = df['title'] \
             # .apply(lambda title: get_similarity_lcs(title, mref['title']) if title == title else 0)
         # get similarity of ref title to ALL other overviews
+
         tf_idf_sim = get_tf_idf_query_similarity(vectorizer, docs_tfidf, mref['overview'])
         df['overview_sim'] = tf_idf_sim
 
