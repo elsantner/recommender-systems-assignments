@@ -24,9 +24,6 @@ class RecommenderStrategy1:
         # sort them by popularity so we can keep the movie from the sequels with the highest popularity
         df = df.sort_values(by='popularity', ascending=False)
 
-        # drop duplicate ids because the dataset has some problems with that
-        df = df.loc[df['id'].astype(str).drop_duplicates().index]
-
         # try to minimize the sequels recommendations by drop all the movies
         # from recommendations that have the same cast
         df = df.loc[df['cast'].astype(str).drop_duplicates().index]

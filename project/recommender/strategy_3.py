@@ -29,9 +29,6 @@ class RecommenderStrategy3:
         df['genre_sim'] = df['genres'] \
             .apply(lambda g: helper.dice_coefficient(g, mref['genres']) if g == g else 0)
 
-        # drop duplicate ids because the dataset has some problems with that
-        df = df.loc[df['id'].astype(str).drop_duplicates().index]
-
         # try to minimize the sequels recommendations by drop all the movies
         # from recommendations that have the same cast
         df = df.loc[df['cast'].astype(str).drop_duplicates().index]

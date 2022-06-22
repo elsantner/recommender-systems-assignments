@@ -32,6 +32,9 @@ class MovieData:
     def __read_movies_df(self):
         df = read_dat_file(self.path + "/movies_tmdbMeta.csv", cols=movie_columns)
 
+        # drop duplicate ids because the dataset has some problems with that
+        df = df.loc[df['id'].astype(str).drop_duplicates().index]
+
         df['id'] = df['id'].astype(int)
         df['genres'] = df['genres'].apply(parse_list)
         df['cast'] = df['cast'].apply(parse_list)
