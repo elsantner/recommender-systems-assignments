@@ -27,7 +27,6 @@ class MovieData:
     def __init__(self, path='./resources'):
         self.path = path
         self.movies_df = self.__read_movies_df()
-        self.ratings_df = self.__read_ratings_df()
 
     def __read_movies_df(self):
         df = read_dat_file(self.path + "/movies_tmdbMeta.csv", cols=movie_columns)
@@ -48,9 +47,6 @@ class MovieData:
         df['keywords'] = df['keywords'].fillna('')
         df['popularity'] = df['popularity'].fillna(0)
         return df
-
-    def __read_ratings_df(self):
-        return read_dat_file(self.path + "/ratings_small.csv")
 
     def get_movie_metadata(self, movie_id):
         return self.movies_df.loc[self.movies_df['id'] == movie_id].iloc[0]
